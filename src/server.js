@@ -1,6 +1,6 @@
 // ============================================================
-//  NOVA AI — serveur Express
-//  API gratuites : Hugging Face (chat/vision/image) + Tavily (web)
+//  AURA (powered by EGO) — serveur Express
+//  Chat compatible OpenAI (Groq/HF/…) + images + Tavily (web)
 // ============================================================
 
 import 'dotenv/config';
@@ -9,7 +9,7 @@ import multer from 'multer';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { chat, generateImage } from './services/huggingface.js';
+import { chat, generateImage, chatConfigured, chatInfo } from './services/ai.js';
 import { searchWeb, formatSearchContext } from './services/tavily.js';
 import { processFile } from './services/files.js';
 
@@ -33,12 +33,13 @@ const SYSTEM_PROMPT =
 
 // ---------- État des clés (pour l'UI) ----------
 app.get('/api/health', (req, res) => {
+  const info = chatInfo();
   res.json({
     ok: true,
-    hf: Boolean(process.env.HF_TOKEN),
+    chat: chatConfigured(),
     tavily: Boolean(process.env.TAVILY_API_KEY),
-    chatModel: process.env.HF_CHAT_MODEL || 'Qwen/Qwen3.8-27B',
-    imageModel: process.env.HF_IMAGE_MODEL || 'black-forest-labs/FLUX.1-schnell',
+    chatModel: info.model,
+    imageProvider: info.imageProvider,
   });
 });
 
@@ -130,7 +131,10 @@ app.post('/api/generate-image', async (req, res) => {
 });
 
 app.listen(PORT, () => {
+  const info = chatInfo();
   console.log(`\n  🚀 AURA (powered by EGO) en ligne : http://localhost:${PORT}`);
-  if (!process.env.HF_TOKEN) console.log('  ⚠️  HF_TOKEN manquant (chat/vision/images désactivés).');
-  if (!process.env.TAVILY_API_KEY) console.log('  ⚠️  TAVILY_API_KEY manquant (recherche web désactivée).');
+  console.log(`     Chat    : ${info.baseUrl}  (modèle: ${info.model})`);
+  console.log(`     Images  : ${info.imageProvider}`);
+  if (!chatConfigured()) console.log('  ⚠️  CHAT_API_KEY manquante (chat désactivé).');
+  if (!process.env.TAVILY_API_KEY) console.log('  ⚠️  TAVILY_API_KEY manquante (recherche web désactivée).');
 });

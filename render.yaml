@@ -1,7 +1,7 @@
 # Déploiement gratuit sur Render (https://render.com)
 # 1. Pousse ce dossier sur un repo GitHub
 # 2. Sur Render : New > Blueprint > sélectionne ton repo
-# 3. Ajoute tes variables secrètes (HF_TOKEN, TAVILY_API_KEY) dans l'onglet Environment
+# 3. Ajoute tes variables secrètes (CHAT_API_KEY, TAVILY_API_KEY) dans l'onglet Environment
 services:
   - type: web
     name: aura
@@ -10,11 +10,16 @@ services:
     buildCommand: npm install
     startCommand: npm start
     envVars:
-      - key: HF_TOKEN
+      # --- secrets à renseigner dans le dashboard Render ---
+      - key: CHAT_API_KEY
         sync: false
       - key: TAVILY_API_KEY
         sync: false
-      - key: HF_CHAT_MODEL
-        value: Qwen/Qwen3.8-27B
-      - key: HF_IMAGE_MODEL
-        value: black-forest-labs/FLUX.1-schnell
+      # --- config chat (Groq gratuit par défaut) ---
+      - key: CHAT_BASE_URL
+        value: https://api.groq.com/openai/v1
+      - key: CHAT_MODEL
+        value: llama-3.3-70b-versatile
+      # --- images gratuites sans clé ---
+      - key: IMAGE_PROVIDER
+        value: pollinations

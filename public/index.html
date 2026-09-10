@@ -49,12 +49,15 @@
     0%   { transform: translate(0,0) scale(1); }
     100% { transform: translate(40px, 30px) scale(1.15); }
   }
-  /* glyphes spatiaux en orbite */
-  .orbit { position: fixed; z-index: 0; pointer-events: none; opacity: .5; }
+  /* glyphes spatiaux en orbite (au-dessus du fond, sous l'UI) */
+  .orbit { position: fixed; z-index: 1; pointer-events: none; opacity: .85;
+    filter: drop-shadow(0 0 10px rgba(108,140,255,.55)); }
   .orbit svg { display: block; }
-  .orbit.o1 { top: 14%; left: 8%;  animation: float1 18s ease-in-out infinite; }
-  .orbit.o2 { top: 68%; left: 82%; animation: float2 22s ease-in-out infinite; }
-  .orbit.o3 { top: 78%; left: 12%; animation: float1 26s ease-in-out infinite reverse; }
+  .orbit.o1 { top: 20%; left: 6%;  animation: float1 18s ease-in-out infinite; }
+  .orbit.o2 { top: 40%; right: 7%; left: auto; animation: float2 22s ease-in-out infinite; }
+  .orbit.o3 { top: 62%; left: 10%; animation: float1 26s ease-in-out infinite reverse; }
+  .orbit.o4 { top: 74%; right: 12%; left: auto; animation: float2 30s ease-in-out infinite reverse; }
+  @media (max-width: 640px) { .orbit.o2, .orbit.o4 { display: none; } }
   @keyframes float1 { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-26px) rotate(12deg)} }
   @keyframes float2 { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(24px) rotate(-14deg)} }
 
@@ -211,9 +214,14 @@
   <div class="nebula a"></div>
   <div class="nebula b"></div>
   <div class="nebula c"></div>
-  <div class="orbit o1"><svg width="54" height="54" viewBox="0 0 54 54"><circle cx="27" cy="27" r="12" fill="none" stroke="#6c8cff" stroke-width="1.2"/><ellipse cx="27" cy="27" rx="24" ry="8" fill="none" stroke="#a855f7" stroke-width="1" transform="rotate(-20 27 27)"/><circle cx="27" cy="27" r="4" fill="#2dd4bf"/></svg></div>
-  <div class="orbit o2"><svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="7" fill="#ec4899" opacity="0.7"/><circle cx="20" cy="20" r="15" fill="none" stroke="#6c8cff" stroke-width="1" stroke-dasharray="3 4"/></svg></div>
-  <div class="orbit o3"><svg width="30" height="30" viewBox="0 0 30 30"><path d="M4 26 L26 4 M20 4 H26 V10" fill="none" stroke="#2dd4bf" stroke-width="1.4"/><circle cx="9" cy="21" r="3" fill="#a855f7"/></svg></div>
+  <!-- Saturne -->
+  <div class="orbit o1"><svg width="72" height="72" viewBox="0 0 72 72"><circle cx="36" cy="36" r="16" fill="none" stroke="#6c8cff" stroke-width="1.6"/><ellipse cx="36" cy="36" rx="32" ry="11" fill="none" stroke="#a855f7" stroke-width="1.4" transform="rotate(-20 36 36)"/><circle cx="36" cy="36" r="5" fill="#2dd4bf"/></svg></div>
+  <!-- planète en orbite pointillée -->
+  <div class="orbit o2"><svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="9" fill="#ec4899" opacity="0.8"/><circle cx="28" cy="28" r="21" fill="none" stroke="#6c8cff" stroke-width="1.2" stroke-dasharray="3 5"/><circle cx="49" cy="28" r="3" fill="#2dd4bf"/></svg></div>
+  <!-- comète -->
+  <div class="orbit o3"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M6 38 L38 6 M30 6 H38 V14" fill="none" stroke="#2dd4bf" stroke-width="2"/><circle cx="13" cy="31" r="4" fill="#a855f7"/></svg></div>
+  <!-- étoile à 4 branches -->
+  <div class="orbit o4"><svg width="40" height="40" viewBox="0 0 40 40"><path d="M20 2 L24 16 L38 20 L24 24 L20 38 L16 24 L2 20 L16 16 Z" fill="#8ff0e6" opacity="0.85"/></svg></div>
 
   <header>
     <div class="logo">A</div>
@@ -348,7 +356,7 @@ let busy = false;
 
 fetch('/api/health').then(r => r.json()).then(h => {
   statusEl.innerHTML =
-    `<span class="pill ${h.hf ? 'on' : 'off'}">HF ${h.hf ? '✓' : '✗'}</span>` +
+    `<span class="pill ${h.chat ? 'on' : 'off'}">Chat ${h.chat ? '✓' : '✗'}</span>` +
     `<span class="pill ${h.tavily ? 'on' : 'off'}">Web ${h.tavily ? '✓' : '✗'}</span>`;
 }).catch(() => {});
 
