@@ -37,7 +37,7 @@ app.get('/api/health', (req, res) => {
     ok: true,
     hf: Boolean(process.env.HF_TOKEN),
     tavily: Boolean(process.env.TAVILY_API_KEY),
-    chatModel: process.env.HF_CHAT_MODEL || 'Qwen/Qwen2.5-VL-7B-Instruct',
+    chatModel: process.env.HF_CHAT_MODEL || 'Qwen/Qwen3.8-27B',
     imageModel: process.env.HF_IMAGE_MODEL || 'black-forest-labs/FLUX.1-schnell',
   });
 });

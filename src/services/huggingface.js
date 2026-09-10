@@ -6,7 +6,7 @@
 // ============================================================
 
 const HF_TOKEN = process.env.HF_TOKEN;
-const CHAT_MODEL = process.env.HF_CHAT_MODEL || 'Qwen/Qwen2.5-VL-7B-Instruct';
+const CHAT_MODEL = process.env.HF_CHAT_MODEL || 'Qwen/Qwen3.8-27B';
 const IMAGE_MODEL = process.env.HF_IMAGE_MODEL || 'black-forest-labs/FLUX.1-schnell';
 
 // Endpoint OpenAI-compatible (route automatiquement vers un fournisseur gratuit)
