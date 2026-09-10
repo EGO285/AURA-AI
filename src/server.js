@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { chat, generateImage, chatConfigured, chatInfo, listModels } from './services/ai.js';
 import { searchWeb, formatSearchContext } from './services/tavily.js';
 import { processFile } from './services/files.js';
+import { transcribe, speak, voiceConfigured } from './services/voice.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -38,6 +39,7 @@ app.get('/api/health', (req, res) => {
     ok: true,
     chat: chatConfigured(),
     tavily: Boolean(process.env.TAVILY_API_KEY),
+    voice: voiceConfigured(),
     chatModel: info.model,
     imageProvider: info.imageProvider,
   });
@@ -123,6 +125,31 @@ app.post('/api/chat', upload.array('files', 5), async (req, res) => {
     res.json({ reply, sources });
   } catch (err) {
     console.error('[chat]', err);
+    res.status(500).json({ error: err.message || 'Erreur serveur.' });
+  }
+});
+
+// ---------- Voix : transcription (audio -> texte) ----------
+app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'Fichier audio requis.' });
+    const text = await transcribe(req.file.buffer, req.file.originalname || 'audio.webm', req.file.mimetype);
+    res.json({ text });
+  } catch (err) {
+    console.error('[transcribe]', err);
+    res.status(500).json({ error: err.message || 'Erreur serveur.' });
+  }
+});
+
+// ---------- Voix : synthèse (texte -> audio, voix féminine) ----------
+app.post('/api/speak', async (req, res) => {
+  try {
+    const text = (req.body.text || '').trim();
+    if (!text) return res.status(400).json({ error: 'Texte requis.' });
+    const audio = await speak(text);
+    res.json({ audio });
+  } catch (err) {
+    console.error('[speak]', err);
     res.status(500).json({ error: err.message || 'Erreur serveur.' });
   }
 });

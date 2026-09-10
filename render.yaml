@@ -23,3 +23,6 @@ services:
       # --- images gratuites sans clé ---
       - key: IMAGE_PROVIDER
         value: pollinations
+      # --- voix (via la même clé Groq) : voix féminine ---
+      - key: TTS_VOICE
+        value: tara
