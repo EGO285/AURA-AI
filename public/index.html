@@ -9,17 +9,13 @@
     --bg-0: #05060d;
     --bg-1: #0a0d1a;
     --glass: rgba(20, 24, 42, 0.55);
-    --glass-strong: rgba(24, 29, 51, 0.8);
+    --glass-strong: rgba(24, 29, 51, 0.82);
     --border: rgba(140, 160, 255, 0.14);
-    --border-lit: rgba(140, 160, 255, 0.4);
+    --border-lit: rgba(140, 160, 255, 0.42);
     --text: #eef1fb;
     --muted: #99a2c4;
-    --c1: #2dd4bf;   /* teal */
-    --c2: #6c8cff;   /* blue */
-    --c3: #a855f7;   /* violet */
-    --c4: #ec4899;   /* pink */
-    --ok: #34d399;
-    --warn: #fbbf24;
+    --c1: #2dd4bf; --c2: #6c8cff; --c3: #a855f7; --c4: #ec4899;
+    --ok: #34d399; --warn: #fbbf24; --err: #f87171;
     --aurora: linear-gradient(120deg, var(--c1), var(--c2) 40%, var(--c3) 70%, var(--c4));
   }
   * { box-sizing: border-box; }
@@ -28,207 +24,142 @@
     background: radial-gradient(1200px 800px at 75% -10%, #10152e 0%, var(--bg-1) 45%, var(--bg-0) 100%);
     color: var(--text);
     font: 15px/1.6 "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    display: flex; flex-direction: column;
-    overflow: hidden;
+    display: flex; flex-direction: column; overflow: hidden;
   }
-
-  /* ---- Fond spatial animé ---- */
   #space { position: fixed; inset: 0; z-index: 0; display: block; }
-  .nebula {
-    position: fixed; z-index: 0; border-radius: 50%;
-    filter: blur(90px); opacity: .35; pointer-events: none;
-    animation: drift 26s ease-in-out infinite alternate;
-  }
-  .nebula.a { width: 460px; height: 460px; top: -120px; left: -80px;
-    background: radial-gradient(circle, var(--c3), transparent 70%); }
-  .nebula.b { width: 520px; height: 520px; bottom: -160px; right: -100px;
-    background: radial-gradient(circle, var(--c1), transparent 70%); animation-delay: -8s; }
-  .nebula.c { width: 380px; height: 380px; top: 30%; right: 20%;
-    background: radial-gradient(circle, var(--c4), transparent 70%); opacity: .22; animation-delay: -14s; }
-  @keyframes drift {
-    0%   { transform: translate(0,0) scale(1); }
-    100% { transform: translate(40px, 30px) scale(1.15); }
-  }
-  /* glyphes spatiaux en orbite (au-dessus du fond, sous l'UI) */
-  .orbit { position: fixed; z-index: 1; pointer-events: none; opacity: .85;
-    filter: drop-shadow(0 0 10px rgba(108,140,255,.55)); }
+  .nebula { position: fixed; z-index: 0; border-radius: 50%; filter: blur(90px); opacity: .35;
+    pointer-events: none; animation: drift 26s ease-in-out infinite alternate; }
+  .nebula.a { width: 460px; height: 460px; top: -120px; left: -80px; background: radial-gradient(circle, var(--c3), transparent 70%); }
+  .nebula.b { width: 520px; height: 520px; bottom: -160px; right: -100px; background: radial-gradient(circle, var(--c1), transparent 70%); animation-delay: -8s; }
+  .nebula.c { width: 380px; height: 380px; top: 30%; right: 20%; background: radial-gradient(circle, var(--c4), transparent 70%); opacity: .22; animation-delay: -14s; }
+  @keyframes drift { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(40px,30px) scale(1.15)} }
+  .orbit { position: fixed; z-index: 1; pointer-events: none; opacity: .85; filter: drop-shadow(0 0 10px rgba(108,140,255,.55)); }
   .orbit svg { display: block; }
   .orbit.o1 { top: 20%; left: 6%;  animation: float1 18s ease-in-out infinite; }
   .orbit.o2 { top: 40%; right: 7%; left: auto; animation: float2 22s ease-in-out infinite; }
   .orbit.o3 { top: 62%; left: 10%; animation: float1 26s ease-in-out infinite reverse; }
   .orbit.o4 { top: 74%; right: 12%; left: auto; animation: float2 30s ease-in-out infinite reverse; }
-  @media (max-width: 640px) { .orbit.o2, .orbit.o4 { display: none; } }
   @keyframes float1 { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-26px) rotate(12deg)} }
   @keyframes float2 { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(24px) rotate(-14deg)} }
-
-  /* toute l'UI passe au-dessus du fond */
-  header, main, footer { position: relative; z-index: 2; }
-
-  /* ---- Header ---- */
-  header {
-    display: flex; align-items: center; gap: 14px;
-    padding: 14px 22px;
-    background: var(--glass);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
-  }
-  header .logo {
-    width: 40px; height: 40px; border-radius: 12px;
-    background: var(--aurora); background-size: 200% 200%;
-    display: grid; place-items: center; font-weight: 800; font-size: 20px; color: #fff;
-    box-shadow: 0 0 24px rgba(108,140,255,.5);
-    animation: shimmer 6s ease infinite;
-  }
+  @media (max-width: 640px) { .orbit.o2, .orbit.o4 { display: none; } }
   @keyframes shimmer { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
-  header .title-wrap { display: flex; flex-direction: column; line-height: 1.15; }
-  header h1 {
-    font-size: 20px; margin: 0; font-weight: 800; letter-spacing: 3px;
-    background: var(--aurora); background-size: 200% 200%;
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    animation: shimmer 6s ease infinite;
+
+  header, main, footer { position: relative; z-index: 2; }
+  header {
+    display: flex; align-items: center; gap: 14px; padding: 12px 20px;
+    background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border); flex-wrap: wrap;
   }
+  header .logo { width: 40px; height: 40px; border-radius: 12px; background: var(--aurora); background-size: 200% 200%;
+    display: grid; place-items: center; font-weight: 800; font-size: 20px; color: #fff; box-shadow: 0 0 24px rgba(108,140,255,.5); animation: shimmer 6s ease infinite; }
+  header .title-wrap { display: flex; flex-direction: column; line-height: 1.15; }
+  header h1 { font-size: 20px; margin: 0; font-weight: 800; letter-spacing: 3px;
+    background: var(--aurora); background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shimmer 6s ease infinite; }
   header .powered { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
   header .powered b { color: var(--c2); font-weight: 700; }
-  header .status { margin-left: auto; display: flex; gap: 8px; font-size: 12px; }
-  .pill {
-    padding: 4px 11px; border-radius: 999px; border: 1px solid var(--border);
-    color: var(--muted); background: rgba(255,255,255,.03); backdrop-filter: blur(6px);
+  header .spacer { flex: 1; }
+  .model-wrap { display: flex; align-items: center; gap: 6px; }
+  select#modelSelect {
+    background: rgba(255,255,255,.05); color: var(--text); border: 1px solid var(--border);
+    border-radius: 10px; padding: 7px 10px; font: inherit; font-size: 13px; max-width: 230px; cursor: pointer; outline: none;
   }
+  select#modelSelect:focus { border-color: var(--border-lit); }
+  .hdr-btn {
+    border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--text);
+    border-radius: 10px; height: 36px; padding: 0 12px; font-size: 13px; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .hdr-btn:hover { border-color: var(--border-lit); background: rgba(255,255,255,.08); }
+  .status { display: flex; gap: 8px; font-size: 12px; }
+  .pill { padding: 4px 11px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); background: rgba(255,255,255,.03); }
   .pill.on { color: var(--ok); border-color: rgba(52,211,153,.4); box-shadow: 0 0 12px rgba(52,211,153,.2); }
   .pill.off { color: var(--warn); border-color: rgba(251,191,36,.4); }
 
-  /* ---- Zone de chat ---- */
-  main {
-    flex: 1; overflow-y: auto; padding: 26px 16px 10px;
-    display: flex; flex-direction: column; gap: 18px;
-    max-width: 920px; width: 100%; margin: 0 auto;
-    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
-  }
-  main::-webkit-scrollbar { width: 8px; }
-  main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+  main { flex: 1; overflow-y: auto; padding: 24px 16px 10px; display: flex; flex-direction: column; gap: 16px;
+    max-width: 920px; width: 100%; margin: 0 auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  main::-webkit-scrollbar { width: 8px; } main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
 
   .msg { display: flex; gap: 12px; align-items: flex-start; animation: rise .35s ease both; }
   @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-  .msg .avatar {
-    flex: 0 0 34px; width: 34px; height: 34px; border-radius: 10px;
-    display: grid; place-items: center; font-size: 13px; font-weight: 700;
-  }
+  .msg .avatar { flex: 0 0 34px; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
   .msg.user .avatar { background: rgba(108,140,255,.18); border: 1px solid var(--border); color: var(--text); }
   .msg.assistant .avatar { background: var(--aurora); background-size: 200% 200%; color: #fff; box-shadow: 0 0 18px rgba(168,85,247,.45); animation: shimmer 6s ease infinite; }
-  .bubble {
-    background: var(--glass); border: 1px solid var(--border);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    padding: 13px 16px; border-radius: 14px; max-width: 100%;
-    white-space: pre-wrap; word-wrap: break-word; overflow-wrap: anywhere;
-    box-shadow: 0 8px 30px rgba(0,0,0,.25);
-  }
+  .col { display: flex; flex-direction: column; gap: 6px; max-width: 100%; min-width: 0; }
+  .bubble { background: var(--glass); border: 1px solid var(--border); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    padding: 13px 16px; border-radius: 14px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: anywhere; box-shadow: 0 8px 30px rgba(0,0,0,.25); }
   .msg.user .bubble { background: rgba(108,140,255,.13); border-color: var(--border-lit); }
   .bubble img { max-width: 340px; border-radius: 12px; display: block; margin-top: 10px; border: 1px solid var(--border); }
   .bubble code { background: rgba(0,0,0,.4); padding: 1px 6px; border-radius: 5px; font-size: 13px; color: var(--c1); }
-  .bubble pre { background: rgba(0,0,0,.45); padding: 13px; border-radius: 10px; overflow-x: auto; border: 1px solid var(--border); }
+  .bubble pre { background: rgba(0,0,0,.5); padding: 13px; border-radius: 10px; overflow-x: auto; border: 1px solid var(--border); position: relative; }
   .attachments { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .attachments .chip { font-size: 12px; }
   .sources { margin-top: 12px; font-size: 13px; }
   .sources > strong { color: var(--c1); }
-  .sources a { color: var(--c2); text-decoration: none; }
-  .sources a:hover { text-decoration: underline; }
+  .sources a { color: var(--c2); text-decoration: none; } .sources a:hover { text-decoration: underline; }
   .sources .src { padding: 7px 0; border-top: 1px dashed var(--border); }
+  .actions { display: flex; gap: 6px; opacity: 0; transition: opacity .2s; }
+  .msg:hover .actions { opacity: 1; }
+  .act-btn { border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--muted); border-radius: 8px;
+    font-size: 12px; padding: 3px 9px; cursor: pointer; transition: all .15s; }
+  .act-btn:hover { color: var(--text); border-color: var(--border-lit); }
   .typing { color: var(--muted); font-style: italic; }
   .typing::after { content: '✦'; margin-left: 6px; animation: pulse 1.2s ease infinite; display: inline-block; }
   @keyframes pulse { 0%,100%{opacity:.2; transform:scale(.8)} 50%{opacity:1; transform:scale(1.2)} }
 
-  /* ---- Écran d'accueil ---- */
-  .empty { text-align: center; color: var(--muted); margin-top: 9vh; animation: rise .6s ease both; }
-  .empty .halo {
-    width: 92px; height: 92px; margin: 0 auto 18px; border-radius: 50%;
-    background: var(--aurora); background-size: 200% 200%;
-    display: grid; place-items: center; font-size: 42px; font-weight: 800; color: #fff;
-    box-shadow: 0 0 60px rgba(108,140,255,.55); animation: shimmer 6s ease infinite;
-  }
+  .empty { text-align: center; color: var(--muted); margin-top: 7vh; animation: rise .6s ease both; }
+  .empty .halo { width: 92px; height: 92px; margin: 0 auto 18px; border-radius: 50%; background: var(--aurora); background-size: 200% 200%;
+    display: grid; place-items: center; font-size: 42px; font-weight: 800; color: #fff; box-shadow: 0 0 60px rgba(108,140,255,.55); animation: shimmer 6s ease infinite; }
   .empty h2 { color: var(--text); font-weight: 800; font-size: 26px; margin: 0 0 6px; letter-spacing: 1px; }
-  .empty p { max-width: 460px; margin: 0 auto; }
-  .empty .caps { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
-  .empty .cap {
-    background: var(--glass); border: 1px solid var(--border); backdrop-filter: blur(10px);
-    padding: 10px 15px; border-radius: 12px; font-size: 13px; color: var(--text);
-    transition: transform .2s, border-color .2s;
-  }
-  .empty .cap:hover { transform: translateY(-3px); border-color: var(--border-lit); }
+  .empty p { max-width: 460px; margin: 0 auto 4px; }
+  .examples { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+  .example { background: var(--glass); border: 1px solid var(--border); backdrop-filter: blur(10px);
+    padding: 11px 15px; border-radius: 12px; font-size: 13px; color: var(--text); cursor: pointer; transition: transform .2s, border-color .2s; }
+  .example:hover { transform: translateY(-3px); border-color: var(--border-lit); }
 
-  /* ---- Composer ---- */
-  footer {
-    padding: 12px 16px 18px;
-    background: linear-gradient(to top, var(--bg-0), transparent);
-  }
-  .composer {
-    max-width: 920px; margin: 0 auto;
-    background: var(--glass-strong); border: 1px solid var(--border);
-    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-    border-radius: 18px; padding: 12px 14px;
-    box-shadow: 0 12px 40px rgba(0,0,0,.35);
-  }
+  footer { padding: 10px 16px 16px; background: linear-gradient(to top, var(--bg-0), transparent); }
+  .composer { max-width: 920px; margin: 0 auto; background: var(--glass-strong); border: 1px solid var(--border);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: 18px; padding: 12px 14px; box-shadow: 0 12px 40px rgba(0,0,0,.35); }
   .toolbar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
-  .toggle {
-    display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
-    font-size: 13px; color: var(--muted);
-    padding: 6px 12px; border: 1px solid var(--border); border-radius: 10px;
-    background: rgba(255,255,255,.03); user-select: none; transition: all .2s;
-  }
+  .toggle { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: var(--muted);
+    padding: 6px 12px; border: 1px solid var(--border); border-radius: 10px; background: rgba(255,255,255,.03); user-select: none; transition: all .2s; }
   .toggle:hover { border-color: var(--border-lit); }
   .toggle.active { color: #fff; border-color: transparent; background-image: var(--aurora); box-shadow: 0 0 16px rgba(108,140,255,.4); }
-  .chip {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(255,255,255,.04); border: 1px solid var(--border);
-    padding: 5px 9px; border-radius: 9px; font-size: 12px; color: var(--muted);
-  }
+  .toggle.disabled { opacity: .4; pointer-events: none; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.04); border: 1px solid var(--border);
+    padding: 5px 9px; border-radius: 9px; font-size: 12px; color: var(--muted); }
   .chip button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0; line-height: 1; }
   .chip button:hover { color: var(--c4); }
   .input-row { display: flex; gap: 8px; align-items: flex-end; }
-  textarea {
-    flex: 1; resize: none; min-height: 46px; max-height: 180px;
-    background: rgba(0,0,0,.25); color: var(--text); border: 1px solid var(--border);
-    border-radius: 12px; padding: 12px 14px; font: inherit; outline: none; transition: border-color .2s, box-shadow .2s;
-  }
+  textarea { flex: 1; resize: none; min-height: 46px; max-height: 200px; background: rgba(0,0,0,.25); color: var(--text);
+    border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font: inherit; outline: none; transition: border-color .2s, box-shadow .2s; }
   textarea::placeholder { color: var(--muted); }
   textarea:focus { border-color: var(--border-lit); box-shadow: 0 0 0 3px rgba(108,140,255,.12); }
-  .icon-btn, .send-btn {
-    border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--text);
-    border-radius: 12px; cursor: pointer; height: 46px; padding: 0 14px; font-size: 16px; transition: all .2s;
-  }
+  .icon-btn, .send-btn { border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--text);
+    border-radius: 12px; cursor: pointer; height: 46px; padding: 0 14px; font-size: 16px; transition: all .2s; }
   .icon-btn:hover { border-color: var(--border-lit); }
   .send-btn { background-image: var(--aurora); background-size: 200% 200%; border: none; color: #fff; font-weight: 700; padding: 0 20px; box-shadow: 0 0 18px rgba(108,140,255,.4); }
   .send-btn:hover { animation: shimmer 3s ease infinite; }
   .send-btn:disabled { opacity: .5; cursor: default; box-shadow: none; }
-  .hint { color: var(--muted); font-size: 12px; margin-top: 8px; padding-left: 2px; }
-
-  @media (max-width: 560px) {
-    header h1 { font-size: 17px; }
-    .empty { margin-top: 5vh; }
-    .bubble img { max-width: 100%; }
-  }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 8px; padding-left: 2px; display: flex; justify-content: space-between; gap: 10px; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px); z-index: 50;
+    background: var(--glass-strong); border: 1px solid var(--border-lit); color: var(--text); padding: 10px 16px; border-radius: 12px;
+    backdrop-filter: blur(14px); box-shadow: 0 10px 30px rgba(0,0,0,.4); opacity: 0; transition: all .3s; pointer-events: none; font-size: 13px; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  @media (max-width: 560px) { header h1 { font-size: 17px; } select#modelSelect { max-width: 150px; } .bubble img { max-width: 100%; } }
 </style>
 </head>
 <body>
-  <!-- fond spatial -->
   <canvas id="space"></canvas>
-  <div class="nebula a"></div>
-  <div class="nebula b"></div>
-  <div class="nebula c"></div>
-  <!-- Saturne -->
+  <div class="nebula a"></div><div class="nebula b"></div><div class="nebula c"></div>
   <div class="orbit o1"><svg width="72" height="72" viewBox="0 0 72 72"><circle cx="36" cy="36" r="16" fill="none" stroke="#6c8cff" stroke-width="1.6"/><ellipse cx="36" cy="36" rx="32" ry="11" fill="none" stroke="#a855f7" stroke-width="1.4" transform="rotate(-20 36 36)"/><circle cx="36" cy="36" r="5" fill="#2dd4bf"/></svg></div>
-  <!-- planète en orbite pointillée -->
   <div class="orbit o2"><svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="9" fill="#ec4899" opacity="0.8"/><circle cx="28" cy="28" r="21" fill="none" stroke="#6c8cff" stroke-width="1.2" stroke-dasharray="3 5"/><circle cx="49" cy="28" r="3" fill="#2dd4bf"/></svg></div>
-  <!-- comète -->
   <div class="orbit o3"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M6 38 L38 6 M30 6 H38 V14" fill="none" stroke="#2dd4bf" stroke-width="2"/><circle cx="13" cy="31" r="4" fill="#a855f7"/></svg></div>
-  <!-- étoile à 4 branches -->
   <div class="orbit o4"><svg width="40" height="40" viewBox="0 0 40 40"><path d="M20 2 L24 16 L38 20 L24 24 L20 38 L16 24 L2 20 L16 16 Z" fill="#8ff0e6" opacity="0.85"/></svg></div>
 
   <header>
     <div class="logo">A</div>
-    <div class="title-wrap">
-      <h1>AURA</h1>
-      <span class="powered">powered by <b>EGO</b></span>
-    </div>
+    <div class="title-wrap"><h1>AURA</h1><span class="powered">powered by <b>EGO</b></span></div>
+    <div class="spacer"></div>
+    <div class="model-wrap"><select id="modelSelect" title="Modèle de chat"></select></div>
+    <button class="hdr-btn" id="newChatBtn" title="Nouvelle conversation">✚ Nouveau</button>
     <div class="status" id="status"></div>
   </header>
 
@@ -236,13 +167,12 @@
     <div class="empty" id="empty">
       <div class="halo">A</div>
       <h2>Bonjour, je suis AURA</h2>
-      <p>Pose une question, envoie une image ou un fichier, génère une image, ou explore le web en temps réel.</p>
-      <div class="caps">
-        <div class="cap">💬 Chat</div>
-        <div class="cap">👁️ Vision</div>
-        <div class="cap">📎 Fichiers</div>
-        <div class="cap">🎨 Images</div>
-        <div class="cap">🌐 Web</div>
+      <p>Pose une question, envoie une image ou un fichier, génère une image, ou explore le web.</p>
+      <div class="examples" id="examples">
+        <div class="example" data-p="Explique-moi les trous noirs simplement.">🌌 Explique les trous noirs</div>
+        <div class="example" data-p="Écris une fonction JavaScript qui trie un tableau d'objets par date.">💻 Code une fonction JS</div>
+        <div class="example" data-img="un vaisseau spatial futuriste au-dessus d'une planète violette, ultra détaillé">🎨 Génère une image</div>
+        <div class="example" data-web="quelles sont les dernières actus tech ?">🌐 Cherche sur le web</div>
       </div>
     </div>
   </main>
@@ -252,245 +182,254 @@
       <div class="toolbar">
         <label class="toggle" id="webToggle">🌐 Recherche web</label>
         <label class="toggle" id="imgToggle">🎨 Mode image</label>
-        <input type="file" id="fileInput" multiple hidden
-               accept="image/*,.pdf,.txt,.md,.csv,.json,.js,.py,.html,.css,.xml,.log,.ts" />
+        <button class="toggle" id="regenBtn" title="Régénérer la dernière réponse">↻ Régénérer</button>
+        <input type="file" id="fileInput" multiple hidden accept="image/*,.pdf,.txt,.md,.csv,.json,.js,.py,.html,.css,.xml,.log,.ts" />
         <span id="fileChips" class="attachments"></span>
       </div>
       <div class="input-row">
         <button class="icon-btn" id="attachBtn" title="Joindre un fichier">📎</button>
-        <textarea id="input" placeholder="Écris ton message…  (Entrée pour envoyer · Maj+Entrée = nouvelle ligne)"></textarea>
+        <textarea id="input" placeholder="Écris ton message…  (Entrée = envoyer · Maj+Entrée = nouvelle ligne)"></textarea>
         <button class="send-btn" id="sendBtn">Envoyer</button>
       </div>
-      <div class="hint" id="hint">Mode image OFF — je réponds par du texte. Active « Mode image » pour générer une image.</div>
+      <div class="hint"><span id="hint">Mode texte. Active « Mode image » pour générer une image.</span><span id="charCount"></span></div>
     </div>
   </footer>
+  <div class="toast" id="toast"></div>
 
 <script>
-/* ===================== FOND SPATIAL ANIMÉ ===================== */
+/* ============ FOND SPATIAL ============ */
 (function () {
-  const canvas = document.getElementById('space');
-  const ctx = canvas.getContext('2d');
+  const canvas = document.getElementById('space'), ctx = canvas.getContext('2d');
   let w, h, stars = [], mouse = { x: -9999, y: -9999 };
   const COLORS = ['#ffffff', '#bcd0ff', '#c9a8ff', '#8ff0e6'];
-
   function resize() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
+    w = canvas.width = innerWidth; h = canvas.height = innerHeight;
     const count = Math.min(180, Math.floor((w * h) / 9000));
     stars = Array.from({ length: count }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      z: Math.random() * 0.8 + 0.2,          // profondeur (parallaxe)
-      r: Math.random() * 1.4 + 0.3,
-      c: COLORS[(Math.random() * COLORS.length) | 0],
-      tw: Math.random() * Math.PI * 2,        // phase scintillement
-      vx: (Math.random() - 0.5) * 0.08,
-      vy: (Math.random() - 0.5) * 0.08,
+      x: Math.random()*w, y: Math.random()*h, z: Math.random()*0.8+0.2, r: Math.random()*1.4+0.3,
+      c: COLORS[(Math.random()*COLORS.length)|0], tw: Math.random()*Math.PI*2,
+      vx: (Math.random()-0.5)*0.08, vy: (Math.random()-0.5)*0.08,
     }));
   }
-  window.addEventListener('resize', resize);
-  window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
-  window.addEventListener('mouseout', () => { mouse.x = mouse.y = -9999; });
-
+  addEventListener('resize', resize);
+  addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  addEventListener('mouseout', () => { mouse.x = mouse.y = -9999; });
   function frame(t) {
     ctx.clearRect(0, 0, w, h);
-    // dérive + scintillement
     for (const s of stars) {
-      s.x += s.vx * s.z; s.y += s.vy * s.z;
-      if (s.x < 0) s.x = w; if (s.x > w) s.x = 0;
-      if (s.y < 0) s.y = h; if (s.y > h) s.y = 0;
-      const twinkle = 0.5 + 0.5 * Math.sin(t * 0.002 + s.tw);
-      ctx.globalAlpha = (0.35 + 0.65 * twinkle) * s.z;
-      ctx.fillStyle = s.c;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r * s.z, 0, Math.PI * 2);
-      ctx.fill();
+      s.x += s.vx*s.z; s.y += s.vy*s.z;
+      if (s.x<0) s.x=w; if (s.x>w) s.x=0; if (s.y<0) s.y=h; if (s.y>h) s.y=0;
+      const tw = 0.5+0.5*Math.sin(t*0.002+s.tw);
+      ctx.globalAlpha = (0.35+0.65*tw)*s.z; ctx.fillStyle = s.c;
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r*s.z, 0, 7); ctx.fill();
     }
-    // constellations : lignes entre étoiles proches + vers le curseur
     ctx.globalAlpha = 1;
-    for (let i = 0; i < stars.length; i++) {
-      const a = stars[i];
-      for (let j = i + 1; j < stars.length; j++) {
-        const b = stars[j];
-        const dx = a.x - b.x, dy = a.y - b.y;
-        const d2 = dx * dx + dy * dy;
-        if (d2 < 14000) {
-          ctx.strokeStyle = 'rgba(140,160,255,' + (0.10 * (1 - d2 / 14000)) + ')';
-          ctx.lineWidth = 0.6;
-          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-        }
-      }
-      // lien vers la souris
-      const mdx = a.x - mouse.x, mdy = a.y - mouse.y;
-      const md2 = mdx * mdx + mdy * mdy;
-      if (md2 < 26000) {
-        ctx.strokeStyle = 'rgba(45,212,191,' + (0.28 * (1 - md2 / 26000)) + ')';
-        ctx.lineWidth = 0.8;
-        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
-      }
+    for (let i=0;i<stars.length;i++){ const a=stars[i];
+      for (let j=i+1;j<stars.length;j++){ const b=stars[j]; const dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy;
+        if (d2<14000){ ctx.strokeStyle='rgba(140,160,255,'+(0.10*(1-d2/14000))+')'; ctx.lineWidth=0.6; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); } }
+      const mdx=a.x-mouse.x,mdy=a.y-mouse.y,md2=mdx*mdx+mdy*mdy;
+      if (md2<26000){ ctx.strokeStyle='rgba(45,212,191,'+(0.28*(1-md2/26000))+')'; ctx.lineWidth=0.8; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(mouse.x,mouse.y); ctx.stroke(); }
     }
     requestAnimationFrame(frame);
   }
-  resize();
-  requestAnimationFrame(frame);
+  resize(); requestAnimationFrame(frame);
 })();
 
-/* ===================== LOGIQUE DE CHAT ===================== */
-const chat = document.getElementById('chat');
-const empty = document.getElementById('empty');
-const input = document.getElementById('input');
-const sendBtn = document.getElementById('sendBtn');
-const attachBtn = document.getElementById('attachBtn');
-const fileInput = document.getElementById('fileInput');
-const fileChips = document.getElementById('fileChips');
-const webToggle = document.getElementById('webToggle');
-const imgToggle = document.getElementById('imgToggle');
-const hint = document.getElementById('hint');
-const statusEl = document.getElementById('status');
+/* ============ CHAT ============ */
+const $ = id => document.getElementById(id);
+const chat=$('chat'), empty=$('empty'), input=$('input'), sendBtn=$('sendBtn'), attachBtn=$('attachBtn'),
+  fileInput=$('fileInput'), fileChips=$('fileChips'), webToggle=$('webToggle'), imgToggle=$('imgToggle'),
+  regenBtn=$('regenBtn'), hint=$('hint'), statusEl=$('status'), modelSelect=$('modelSelect'),
+  newChatBtn=$('newChatBtn'), toast=$('toast'), charCount=$('charCount');
 
-let history = [];
-let files = [];
-let webSearch = false;
-let imageMode = false;
-let busy = false;
-
-fetch('/api/health').then(r => r.json()).then(h => {
-  statusEl.innerHTML =
-    `<span class="pill ${h.chat ? 'on' : 'off'}">Chat ${h.chat ? '✓' : '✗'}</span>` +
-    `<span class="pill ${h.tavily ? 'on' : 'off'}">Web ${h.tavily ? '✓' : '✗'}</span>`;
-}).catch(() => {});
-
-webToggle.onclick = () => { webSearch = !webSearch; webToggle.classList.toggle('active', webSearch); };
-imgToggle.onclick = () => {
-  imageMode = !imageMode;
-  imgToggle.classList.toggle('active', imageMode);
-  hint.textContent = imageMode
-    ? 'Mode image ON — ton texte devient un prompt de génération d\'image.'
-    : 'Mode image OFF — je réponds par du texte. Active « Mode image » pour générer une image.';
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('aura_'+k); return v===null?d:JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('aura_'+k, JSON.stringify(v)); } catch {} },
 };
 
-attachBtn.onclick = () => fileInput.click();
-fileInput.onchange = () => { files = [...files, ...fileInput.files]; fileInput.value = ''; renderChips(); };
-function renderChips() {
-  fileChips.innerHTML = '';
-  files.forEach((f, i) => {
-    const chip = document.createElement('span');
-    chip.className = 'chip';
-    chip.innerHTML = `${f.type.startsWith('image/') ? '🖼️' : '📄'} ${escapeHtml(f.name)} <button title="Retirer">✕</button>`;
-    chip.querySelector('button').onclick = () => { files.splice(i, 1); renderChips(); };
-    fileChips.appendChild(chip);
+let history = store.get('history', []);      // [{role, text}]
+let files = [];
+let webSearch = store.get('web', false);
+let imageMode = store.get('img', false);
+let selectedModel = store.get('model', '');
+let busy = false;
+
+/* --- init : modèles + état + historique --- */
+fetch('/api/health').then(r=>r.json()).then(h => {
+  statusEl.innerHTML =
+    `<span class="pill ${h.chat?'on':'off'}">Chat ${h.chat?'✓':'✗'}</span>`+
+    `<span class="pill ${h.tavily?'on':'off'}">Web ${h.tavily?'✓':'✗'}</span>`;
+  if (!h.tavily) { webToggle.classList.add('disabled'); webToggle.title = 'Ajoute TAVILY_API_KEY pour activer'; }
+}).catch(()=>{});
+
+fetch('/api/models').then(r=>r.json()).then(d => {
+  const models = d.models || [];
+  modelSelect.innerHTML = '';
+  models.forEach(m => {
+    const o = document.createElement('option');
+    o.value = m.id;
+    o.textContent = (m.vision ? '👁️ ' : '') + m.id;
+    modelSelect.appendChild(o);
   });
+  if (!selectedModel) selectedModel = d.current || (models[0] && models[0].id) || '';
+  if (selectedModel && models.find(m => m.id === selectedModel)) modelSelect.value = selectedModel;
+  else if (models[0]) { selectedModel = models[0].id; modelSelect.value = selectedModel; }
+}).catch(()=>{ const o=document.createElement('option'); o.textContent='(modèle par défaut)'; modelSelect.appendChild(o); });
+
+modelSelect.onchange = () => { selectedModel = modelSelect.value; store.set('model', selectedModel); showToast('Modèle : ' + selectedModel); };
+
+webToggle.classList.toggle('active', webSearch);
+imgToggle.classList.toggle('active', imageMode);
+updateHint();
+restoreHistory();
+
+/* --- toggles --- */
+webToggle.onclick = () => { webSearch=!webSearch; webToggle.classList.toggle('active',webSearch); store.set('web',webSearch); };
+imgToggle.onclick = () => { imageMode=!imageMode; imgToggle.classList.toggle('active',imageMode); store.set('img',imageMode); updateHint(); };
+function updateHint(){ hint.textContent = imageMode ? 'Mode image ON — ton texte devient un prompt d\'image.' : 'Mode texte. Active « Mode image » pour générer une image.'; }
+
+/* --- nouvelle conversation --- */
+newChatBtn.onclick = () => {
+  history = []; store.set('history', []);
+  chat.querySelectorAll('.msg').forEach(n => n.remove());
+  empty.style.display = ''; showToast('Nouvelle conversation');
+};
+
+/* --- fichiers --- */
+attachBtn.onclick = () => fileInput.click();
+fileInput.onchange = () => { files=[...files, ...fileInput.files]; fileInput.value=''; renderChips(); };
+function renderChips(){
+  fileChips.innerHTML='';
+  files.forEach((f,i)=>{ const c=document.createElement('span'); c.className='chip';
+    c.innerHTML=`${f.type.startsWith('image/')?'🖼️':'📄'} ${esc(f.name)} <button title="Retirer">✕</button>`;
+    c.querySelector('button').onclick=()=>{ files.splice(i,1); renderChips(); }; fileChips.appendChild(c); });
 }
 
-input.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+/* --- exemples cliquables --- */
+$('examples').querySelectorAll('.example').forEach(ex => ex.onclick = () => {
+  if (ex.dataset.img) { if(!imageMode){imageMode=true;imgToggle.classList.add('active');store.set('img',true);updateHint();} input.value=ex.dataset.img; }
+  else if (ex.dataset.web) { if(!webSearch && !webToggle.classList.contains('disabled')){webSearch=true;webToggle.classList.add('active');store.set('web',true);} input.value=ex.dataset.web; }
+  else input.value = ex.dataset.p;
+  autise(); input.focus();
 });
-sendBtn.onclick = send;
 
-function send() {
+/* --- saisie --- */
+input.addEventListener('input', () => { autise(); charCount.textContent = input.value.length ? input.value.length+' car.' : ''; });
+input.addEventListener('keydown', e => { if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); } });
+sendBtn.onclick = () => send();
+function autise(){ input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,200)+'px'; }
+
+/* --- régénérer --- */
+regenBtn.onclick = () => {
   if (busy) return;
-  const text = input.value.trim();
-  if (!text && files.length === 0) return;
-  if (imageMode) return generate(text);
+  let lastUser = null;
+  for (let i=history.length-1;i>=0;i--){ if(history[i].role==='user'){ lastUser=history[i].text; break; } }
+  if (!lastUser) return showToast('Rien à régénérer');
+  if (history.length && history[history.length-1].role==='assistant') history.pop();
+  if (history.length && history[history.length-1].role==='user') history.pop();
+  store.set('history', history);
+  const msgs = chat.querySelectorAll('.msg');
+  if (msgs.length) msgs[msgs.length-1].remove();
+  send(lastUser, true);
+};
 
-  addMessage('user', text, files.map(f => ({ name: f.name, isImage: f.type.startsWith('image/') })));
-  const sending = files;
-  files = []; renderChips();
-  input.value = '';
+/* --- envoi --- */
+function send(forcedText, isRegen) {
+  if (busy) return;
+  const text = forcedText!==undefined ? forcedText : input.value.trim();
+  if (!text && files.length===0) return;
+  if (imageMode && !isRegen) return generate(text);
+
+  if (!isRegen) addMessage('user', text, files.map(f=>({name:f.name,isImage:f.type.startsWith('image/')})));
+  const sending = files; files=[]; renderChips();
+  if (forcedText===undefined) { input.value=''; autise(); charCount.textContent=''; }
 
   const form = new FormData();
   form.append('message', text);
   form.append('history', JSON.stringify(history));
   form.append('webSearch', String(webSearch));
+  if (selectedModel) form.append('model', selectedModel);
   sending.forEach(f => form.append('files', f));
 
   const typing = addTyping();
   setBusy(true);
-  fetch('/api/chat', { method: 'POST', body: form })
-    .then(r => r.json())
+  fetch('/api/chat', { method:'POST', body:form })
+    .then(r=>r.json())
     .then(data => {
       typing.remove();
-      if (data.error) { addMessage('assistant', '⚠️ ' + data.error); return; }
-      history.push({ role: 'user', text });
-      history.push({ role: 'assistant', text: data.reply });
+      if (data.error) { addMessage('assistant','⚠️ '+data.error); showToast('Erreur'); return; }
+      history.push({role:'user',text}); history.push({role:'assistant',text:data.reply}); store.set('history',history);
       addMessage('assistant', data.reply, null, data.sources);
     })
-    .catch(err => { typing.remove(); addMessage('assistant', '⚠️ ' + err.message); })
-    .finally(() => setBusy(false));
+    .catch(err => { typing.remove(); addMessage('assistant','⚠️ '+err.message); })
+    .finally(()=>setBusy(false));
 }
 
 function generate(prompt) {
   if (!prompt) return;
-  addMessage('user', '🎨 ' + prompt);
-  input.value = '';
-  const typing = addTyping('Génération de l\'image…');
-  setBusy(true);
-  fetch('/api/generate-image', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt }),
-  })
-    .then(r => r.json())
-    .then(data => {
-      typing.remove();
-      if (data.error) { addMessage('assistant', '⚠️ ' + data.error); return; }
-      addMessageImage('assistant', data.image);
-    })
-    .catch(err => { typing.remove(); addMessage('assistant', '⚠️ ' + err.message); })
-    .finally(() => setBusy(false));
+  addMessage('user','🎨 '+prompt); input.value=''; autise(); charCount.textContent='';
+  const typing = addTyping('Génération de l\'image…'); setBusy(true);
+  fetch('/api/generate-image',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompt}) })
+    .then(r=>r.json())
+    .then(data => { typing.remove(); if(data.error){ addMessage('assistant','⚠️ '+data.error); return; } addMessageImage(data.image, prompt); })
+    .catch(err => { typing.remove(); addMessage('assistant','⚠️ '+err.message); })
+    .finally(()=>setBusy(false));
 }
 
+/* --- rendu --- */
 function addMessage(role, text, attachments, sources) {
-  empty.style.display = 'none';
-  const el = document.createElement('div');
-  el.className = 'msg ' + role;
-  let inner = `<div class="avatar">${role === 'user' ? 'Moi' : 'A'}</div><div class="bubble">${renderText(text)}`;
-  if (attachments && attachments.length) {
-    inner += '<div class="attachments">' +
-      attachments.map(a => `<span class="chip">${a.isImage ? '🖼️' : '📄'} ${escapeHtml(a.name)}</span>`).join('') +
-      '</div>';
+  empty.style.display='none';
+  const el=document.createElement('div'); el.className='msg '+role;
+  const col=document.createElement('div'); col.className='col';
+  let html=`<div class="bubble">${renderText(text)}`;
+  if (attachments && attachments.length) html+='<div class="attachments">'+attachments.map(a=>`<span class="chip">${a.isImage?'🖼️':'📄'} ${esc(a.name)}</span>`).join('')+'</div>';
+  if (sources && sources.length) html+='<div class="sources"><strong>Sources</strong>'+sources.map((s,i)=>`<div class="src">[${i+1}] <a href="${s.url}" target="_blank" rel="noopener">${esc(s.title||s.url)}</a></div>`).join('')+'</div>';
+  html+='</div>';
+  col.innerHTML=html;
+  if (role==='assistant') {
+    const bar=document.createElement('div'); bar.className='actions';
+    const copy=document.createElement('button'); copy.className='act-btn'; copy.textContent='📋 Copier';
+    copy.onclick=()=>{ navigator.clipboard.writeText(text).then(()=>showToast('Copié')).catch(()=>showToast('Copie impossible')); };
+    bar.appendChild(copy); col.appendChild(bar);
   }
-  if (sources && sources.length) {
-    inner += '<div class="sources"><strong>Sources</strong>' +
-      sources.map((s, i) => `<div class="src">[${i + 1}] <a href="${s.url}" target="_blank" rel="noopener">${escapeHtml(s.title || s.url)}</a></div>`).join('') +
-      '</div>';
-  }
-  inner += '</div>';
-  el.innerHTML = inner;
-  chat.appendChild(el);
-  scroll();
-  return el;
+  el.innerHTML=`<div class="avatar">${role==='user'?'Moi':'A'}</div>`; el.appendChild(col);
+  chat.appendChild(el); scroll(); return el;
 }
-function addMessageImage(role, dataUrl) {
-  empty.style.display = 'none';
-  const el = document.createElement('div');
-  el.className = 'msg ' + role;
-  el.innerHTML = `<div class="avatar">A</div><div class="bubble">Voici l'image générée :<img src="${dataUrl}" alt="image générée" /></div>`;
-  chat.appendChild(el);
-  scroll();
+function addMessageImage(dataUrl, prompt) {
+  empty.style.display='none';
+  const el=document.createElement('div'); el.className='msg assistant';
+  const col=document.createElement('div'); col.className='col';
+  col.innerHTML=`<div class="bubble">Image générée :<img src="${dataUrl}" alt="${esc(prompt||'')}" /></div>`;
+  const bar=document.createElement('div'); bar.className='actions';
+  const dl=document.createElement('a'); dl.className='act-btn'; dl.textContent='⬇️ Télécharger'; dl.href=dataUrl; dl.download='aura-image.jpg';
+  bar.appendChild(dl); col.appendChild(bar);
+  el.innerHTML=`<div class="avatar">A</div>`; el.appendChild(col);
+  chat.appendChild(el); scroll();
 }
-function addTyping(label = 'AURA réfléchit') {
-  empty.style.display = 'none';
-  const el = document.createElement('div');
-  el.className = 'msg assistant';
-  el.innerHTML = `<div class="avatar">A</div><div class="bubble typing">${label}</div>`;
-  chat.appendChild(el);
-  scroll();
-  return el;
+function addTyping(label='AURA réfléchit') {
+  empty.style.display='none';
+  const el=document.createElement('div'); el.className='msg assistant';
+  el.innerHTML=`<div class="avatar">A</div><div class="col"><div class="bubble typing">${label}</div></div>`;
+  chat.appendChild(el); scroll(); return el;
 }
-function setBusy(b) { busy = b; sendBtn.disabled = b; sendBtn.textContent = b ? '…' : 'Envoyer'; }
-function scroll() { chat.scrollTop = chat.scrollHeight; }
+function restoreHistory() {
+  if (!history.length) return;
+  empty.style.display='none';
+  history.forEach(m => addMessage(m.role, m.text));
+}
+function setBusy(b){ busy=b; sendBtn.disabled=b; sendBtn.textContent=b?'…':'Envoyer'; }
+function scroll(){ chat.scrollTop=chat.scrollHeight; }
+let toastT;
+function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>toast.classList.remove('show'),1800); }
 
-function renderText(text) {
-  let s = escapeHtml(text || '');
-  s = s.replace(/```([\s\S]*?)```/g, (_, c) => `<pre>${c}</pre>`);
-  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
-  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+function renderText(text){
+  let s=esc(text||'');
+  s=s.replace(/```([\s\S]*?)```/g,(_,c)=>`<pre>${c}</pre>`);
+  s=s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
   return s;
 }
-function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
+function esc(str){ return String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 </script>
 </body>
 </html>

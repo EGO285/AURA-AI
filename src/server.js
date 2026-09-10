@@ -9,7 +9,7 @@ import multer from 'multer';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { chat, generateImage, chatConfigured, chatInfo } from './services/ai.js';
+import { chat, generateImage, chatConfigured, chatInfo, listModels } from './services/ai.js';
 import { searchWeb, formatSearchContext } from './services/tavily.js';
 import { processFile } from './services/files.js';
 
@@ -43,11 +43,21 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// ---------- Liste des modèles de chat disponibles ----------
+app.get('/api/models', async (req, res) => {
+  try {
+    res.json(await listModels());
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Erreur serveur.' });
+  }
+});
+
 // ---------- Chat (texte + vision + fichiers + recherche web) ----------
 app.post('/api/chat', upload.array('files', 5), async (req, res) => {
   try {
     const userText = (req.body.message || '').trim();
     const useWebSearch = req.body.webSearch === 'true';
+    const model = (req.body.model || '').trim() || undefined;
     let history = [];
     try {
       history = JSON.parse(req.body.history || '[]');
@@ -109,7 +119,7 @@ app.post('/api/chat', upload.array('files', 5), async (req, res) => {
       { role: 'user', content: userContent },
     ];
 
-    const reply = await chat(messages);
+    const reply = await chat(messages, model);
     res.json({ reply, sources });
   } catch (err) {
     console.error('[chat]', err);

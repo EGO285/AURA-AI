@@ -23,10 +23,63 @@ export function chatInfo() {
   return { baseUrl: CHAT_BASE_URL, model: CHAT_MODEL, imageProvider: IMAGE_PROVIDER };
 }
 
+// Liste les modèles de CHAT disponibles chez le fournisseur (endpoint /models
+// compatible OpenAI). On écarte l'audio (whisper), la voix (orpheus) et les
+// filtres (guard) pour ne garder que ceux qui savent converser.
+export async function listModels() {
+  if (!CHAT_API_KEY) return { models: [], current: CHAT_MODEL };
+  try {
+    const res = await fetch(`${CHAT_BASE_URL}/models`, {
+      headers: { Authorization: `Bearer ${CHAT_API_KEY}` },
+    });
+    if (!res.ok) return { models: [{ id: CHAT_MODEL, vision: false }], current: CHAT_MODEL };
+    const data = await res.json();
+    const list = Array.isArray(data?.data) ? data.data : [];
+
+    const models = list
+      .filter((m) => {
+        const id = (m.id || '').toLowerCase();
+        const inp = m.input_modalities;
+        const out = m.output_modalities;
+        // exclure explicitement audio / voix / filtres
+        if (/whisper|orpheus|guard|tts|embed/.test(id)) return false;
+        // si les modalités sont fournies, exiger entrée+sortie texte
+        if (Array.isArray(out) && !out.includes('text')) return false;
+        if (Array.isArray(inp) && !inp.includes('text')) return false;
+        return true;
+      })
+      .map((m) => ({
+        id: m.id,
+        name: m.name || m.id,
+        vision: Array.isArray(m.input_modalities) && m.input_modalities.includes('image'),
+      }))
+      .sort((a, b) => a.id.localeCompare(b.id));
+
+    if (!models.find((m) => m.id === CHAT_MODEL)) {
+      models.unshift({ id: CHAT_MODEL, name: CHAT_MODEL, vision: false });
+    }
+    return { models, current: CHAT_MODEL };
+  } catch {
+    return { models: [{ id: CHAT_MODEL, vision: false }], current: CHAT_MODEL };
+  }
+}
+
 /**
  * Conversation (texte + images optionnelles), format OpenAI.
  */
-export async function chat(messages) {
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Combien attendre avant un retry sur 429 : header "retry-after", sinon
+// le "try again in X s" du message d'erreur, sinon 5 s. Plafonné à 30 s.
+function retryDelayMs(res, detail) {
+  const header = parseFloat(res.headers.get('retry-after'));
+  if (!Number.isNaN(header)) return Math.min(header * 1000 + 300, 30000);
+  const m = /try again in ([\d.]+)\s*s/i.exec(detail || '');
+  if (m) return Math.min(parseFloat(m[1]) * 1000 + 300, 30000);
+  return 5000;
+}
+
+export async function chat(messages, modelOverride) {
   if (!CHAT_API_KEY) {
     throw new Error(
       'Clé de chat manquante. Renseigne CHAT_API_KEY dans .env ' +
@@ -34,39 +87,56 @@ export async function chat(messages) {
     );
   }
 
-  const res = await fetch(`${CHAT_BASE_URL}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${CHAT_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: CHAT_MODEL,
-      messages,
-      max_tokens: 1024,
-      temperature: 0.7,
-      stream: false,
-    }),
+  const model = (modelOverride && String(modelOverride)) || CHAT_MODEL;
+  const body = JSON.stringify({
+    model,
+    messages,
+    max_tokens: 1024,
+    temperature: 0.7,
+    stream: false,
   });
 
-  if (!res.ok) {
-    const detail = await res.text();
-    if (res.status === 402) {
-      throw new Error(
-        'Crédits épuisés chez le fournisseur de chat. Passe sur un fournisseur gratuit ' +
-        '(ex : Groq — mets CHAT_BASE_URL=https://api.groq.com/openai/v1 et ta clé dans CHAT_API_KEY).'
-      );
+  const MAX_ATTEMPTS = 4;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const res = await fetch(`${CHAT_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${CHAT_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body,
+    });
+
+    // Rate limit : on attend le délai indiqué et on réessaie.
+    if (res.status === 429 && attempt < MAX_ATTEMPTS) {
+      const detail = await res.text();
+      const wait = retryDelayMs(res, detail);
+      console.log(`[chat] 429 rate limit — nouvel essai dans ${Math.round(wait / 1000)}s (tentative ${attempt}/${MAX_ATTEMPTS - 1})`);
+      await sleep(wait);
+      continue;
     }
-    if (res.status === 401) {
-      throw new Error('Clé de chat invalide (401). Vérifie CHAT_API_KEY.');
+
+    if (!res.ok) {
+      const detail = await res.text();
+      if (res.status === 429) {
+        throw new Error('Trop de requêtes (limite gratuite Groq atteinte). Attends une minute, ou passe à un modèle avec une limite plus haute (ex. openai/gpt-oss-20b).');
+      }
+      if (res.status === 402) {
+        throw new Error('Crédits épuisés chez le fournisseur de chat. Passe sur un fournisseur gratuit (Groq / OpenRouter).');
+      }
+      if (res.status === 401) {
+        throw new Error('Clé de chat invalide (401). Vérifie CHAT_API_KEY.');
+      }
+      throw new Error(`Chat (${res.status}) : ${detail.slice(0, 400)}`);
     }
-    throw new Error(`Chat (${res.status}) : ${detail.slice(0, 400)}`);
+
+    const data = await res.json();
+    const reply = data?.choices?.[0]?.message?.content;
+    if (!reply) throw new Error('Réponse vide du modèle de chat.');
+    return reply;
   }
 
-  const data = await res.json();
-  const reply = data?.choices?.[0]?.message?.content;
-  if (!reply) throw new Error('Réponse vide du modèle de chat.');
-  return reply;
+  throw new Error('Limite de requêtes persistante. Réessaie dans une minute.');
 }
 
 /**
