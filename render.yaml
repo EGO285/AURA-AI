@@ -25,4 +25,4 @@ services:
         value: pollinations
       # --- voix (via la même clé Groq) : voix féminine ---
       - key: TTS_VOICE
-        value: tara
+        value: hannah

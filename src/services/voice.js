@@ -10,8 +10,8 @@ const API_KEY  = process.env.CHAT_API_KEY || '';
 
 const STT_MODEL = process.env.STT_MODEL || 'whisper-large-v3';
 const TTS_MODEL = process.env.TTS_MODEL || 'canopylabs/orpheus-v1-english';
-// Voix féminines Orpheus : tara, leah, jess, mia, zoe. Défaut = tara.
-const TTS_VOICE = process.env.TTS_VOICE || 'tara';
+// Voix Groq/Orpheus. Féminine : hannah. Masculines : troy, austin. Défaut = hannah.
+const TTS_VOICE = process.env.TTS_VOICE || 'hannah';
 
 export function voiceConfigured() { return Boolean(API_KEY); }
 
