@@ -1,0 +1,20 @@
+# Déploiement gratuit sur Render (https://render.com)
+# 1. Pousse ce dossier sur un repo GitHub
+# 2. Sur Render : New > Blueprint > sélectionne ton repo
+# 3. Ajoute tes variables secrètes (HF_TOKEN, TAVILY_API_KEY) dans l'onglet Environment
+services:
+  - type: web
+    name: aura
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: HF_TOKEN
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: HF_CHAT_MODEL
+        value: Qwen/Qwen2.5-VL-7B-Instruct
+      - key: HF_IMAGE_MODEL
+        value: black-forest-labs/FLUX.1-schnell
