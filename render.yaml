@@ -19,7 +19,7 @@ services:
       - key: CHAT_BASE_URL
         value: https://api.groq.com/openai/v1
       - key: CHAT_MODEL
-        value: llama-3.1-8b-instant
+        value: qwen/qwen3.8-27b
       # --- images gratuites sans clé ---
       - key: IMAGE_PROVIDER
         value: pollinations

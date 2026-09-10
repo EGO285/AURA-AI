@@ -43,13 +43,12 @@ Le `.env` minimal :
 ```env
 CHAT_BASE_URL=https://api.groq.com/openai/v1
 CHAT_API_KEY=gsk_ta_cle_groq
-CHAT_MODEL=llama-3.1-8b-instant
+CHAT_MODEL=qwen/qwen3.8-27b
 TAVILY_API_KEY=tvly_ta_cle_tavily
 IMAGE_PROVIDER=pollinations
 ```
 
-> Pour l'analyse d'images (vision), mets un modèle multimodal, ex :
-> `CHAT_MODEL=meta-llama/llama-4-scout-17b-16e-instruct`
+> `qwen/qwen3.8-27b` gère déjà le texte **et** la vision. Pour du texte pur plus costaud : `CHAT_MODEL=openai/gpt-oss-120b`.
 
 ---
 
@@ -59,7 +58,7 @@ IMAGE_PROVIDER=pollinations
 |---|---|---|
 | `CHAT_API_KEY` | **(obligatoire)** clé du fournisseur de chat | — |
 | `CHAT_BASE_URL` | endpoint compatible OpenAI | `https://api.groq.com/openai/v1` |
-| `CHAT_MODEL` | modèle de chat | `llama-3.1-8b-instant` |
+| `CHAT_MODEL` | modèle de chat | `qwen/qwen3.8-27b` |
 | `TAVILY_API_KEY` | recherche web (optionnel) | — |
 | `IMAGE_PROVIDER` | `pollinations` (gratuit) ou `hf` | `pollinations` |
 | `HF_TOKEN` | requis seulement si `IMAGE_PROVIDER=hf` | — |
