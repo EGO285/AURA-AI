@@ -12,7 +12,7 @@
 // ---- Config CHAT (compatible OpenAI) ----
 const CHAT_BASE_URL = process.env.CHAT_BASE_URL || 'https://api.groq.com/openai/v1';
 const CHAT_API_KEY  = process.env.CHAT_API_KEY || process.env.HF_TOKEN || '';
-const CHAT_MODEL    = process.env.CHAT_MODEL || process.env.HF_CHAT_MODEL || 'llama-3.3-70b-versatile';
+const CHAT_MODEL    = process.env.CHAT_MODEL || process.env.HF_CHAT_MODEL || 'llama-3.1-8b-instant';
 
 // ---- Config IMAGES ----
 const IMAGE_PROVIDER = (process.env.IMAGE_PROVIDER || 'pollinations').toLowerCase();
