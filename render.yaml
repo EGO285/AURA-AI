@@ -26,3 +26,8 @@ services:
       # --- voix (via la même clé Groq) : voix féminine ---
       - key: TTS_VOICE
         value: hannah
+      # --- historique des conversations (Upstash Redis, optionnel) ---
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false

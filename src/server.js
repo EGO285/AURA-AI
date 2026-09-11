@@ -13,6 +13,7 @@ import { chat, generateImage, chatConfigured, chatInfo, listModels } from './ser
 import { searchWeb, formatSearchContext } from './services/tavily.js';
 import { processFile } from './services/files.js';
 import { transcribe, speak, voiceConfigured } from './services/voice.js';
+import { dbConfigured, listConversations, getConversation, saveConversation, deleteConversation } from './services/db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -24,7 +25,12 @@ const upload = multer({
   limits: { fileSize: 15 * 1024 * 1024 },
 });
 
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '6mb' }));
+
+// Identifiant d'utilisateur (généré côté navigateur), assaini.
+function uid(req) {
+  return String(req.header('x-user-id') || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64);
+}
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 const SYSTEM_PROMPT =
@@ -40,9 +46,64 @@ app.get('/api/health', (req, res) => {
     chat: chatConfigured(),
     tavily: Boolean(process.env.TAVILY_API_KEY),
     voice: voiceConfigured(),
+    db: dbConfigured(),
     chatModel: info.model,
     imageProvider: info.imageProvider,
   });
+});
+
+// ---------- Historique des conversations (Upstash) ----------
+app.get('/api/conversations', async (req, res) => {
+  try {
+    if (!dbConfigured()) return res.json({ enabled: false, conversations: [] });
+    const u = uid(req);
+    if (!u) return res.status(400).json({ error: 'Identifiant utilisateur requis.' });
+    res.json({ enabled: true, conversations: await listConversations(u) });
+  } catch (err) {
+    console.error('[conversations:list]', err);
+    res.status(500).json({ error: err.message || 'Erreur serveur.' });
+  }
+});
+
+app.get('/api/conversations/:id', async (req, res) => {
+  try {
+    if (!dbConfigured()) return res.status(404).json({ error: 'Historique désactivé.' });
+    const u = uid(req);
+    if (!u) return res.status(400).json({ error: 'Identifiant utilisateur requis.' });
+    const conv = await getConversation(u, req.params.id);
+    if (!conv) return res.status(404).json({ error: 'Conversation introuvable.' });
+    res.json(conv);
+  } catch (err) {
+    console.error('[conversations:get]', err);
+    res.status(500).json({ error: err.message || 'Erreur serveur.' });
+  }
+});
+
+app.put('/api/conversations/:id', async (req, res) => {
+  try {
+    if (!dbConfigured()) return res.status(404).json({ error: 'Historique désactivé.' });
+    const u = uid(req);
+    if (!u) return res.status(400).json({ error: 'Identifiant utilisateur requis.' });
+    const { title, messages } = req.body || {};
+    const conv = await saveConversation(u, req.params.id, { title, messages });
+    res.json(conv);
+  } catch (err) {
+    console.error('[conversations:save]', err);
+    res.status(500).json({ error: err.message || 'Erreur serveur.' });
+  }
+});
+
+app.delete('/api/conversations/:id', async (req, res) => {
+  try {
+    if (!dbConfigured()) return res.status(404).json({ error: 'Historique désactivé.' });
+    const u = uid(req);
+    if (!u) return res.status(400).json({ error: 'Identifiant utilisateur requis.' });
+    await deleteConversation(u, req.params.id);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[conversations:delete]', err);
+    res.status(500).json({ error: err.message || 'Erreur serveur.' });
+  }
 });
 
 // ---------- Liste des modèles de chat disponibles ----------
