@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>AURA</title>
 <style>
   :root {
@@ -34,7 +34,8 @@
   @media (max-width: 760px) { .orbit.o2, .orbit.o4 { display: none; } }
   @keyframes shimmer { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
 
-  .app { position: relative; z-index: 2; display: flex; height: 100vh; }
+  /* hauteur réelle du viewport mobile (gère la barre d'adresse qui apparaît/disparaît) */
+  .app { position: relative; z-index: 2; display: flex; height: 100vh; height: 100dvh; height: var(--appvh, 100dvh); overflow: hidden; }
 
   /* ----- Sidebar ----- */
   #sidebar { width: 264px; flex: 0 0 264px; background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
@@ -106,7 +107,7 @@
   .examples { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
   .example { background: var(--glass); border: 1px solid var(--border); backdrop-filter: blur(10px); padding: 11px 15px; border-radius: 12px; font-size: 13px; color: var(--text); cursor: pointer; transition: transform .2s, border-color .2s; }
   .example:hover { transform: translateY(-3px); border-color: var(--border-lit); }
-  footer { padding: 10px 16px 16px; background: linear-gradient(to top, var(--bg-0), transparent); }
+  footer { padding: 10px 16px calc(16px + env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--bg-0), transparent); }
   .composer { max-width: 920px; margin: 0 auto; background: var(--glass-strong); border: 1px solid var(--border); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: 18px; padding: 12px 14px; box-shadow: 0 12px 40px rgba(0,0,0,.35); }
   .toolbar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
   .toggle { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: var(--muted); padding: 6px 12px; border: 1px solid var(--border); border-radius: 10px; background: rgba(255,255,255,.03); user-select: none; transition: all .2s; }
@@ -117,7 +118,7 @@
   .chip button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0; line-height: 1; }
   .chip button:hover { color: var(--c4); }
   .input-row { display: flex; gap: 8px; align-items: flex-end; }
-  textarea { flex: 1; resize: none; min-height: 46px; max-height: 200px; background: rgba(0,0,0,.25); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font: inherit; outline: none; transition: border-color .2s, box-shadow .2s; }
+  textarea { flex: 1; resize: none; min-height: 46px; max-height: 200px; background: rgba(0,0,0,.25); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font: inherit; font-size: 16px; outline: none; transition: border-color .2s, box-shadow .2s; }
   textarea::placeholder { color: var(--muted); }
   textarea:focus { border-color: var(--border-lit); box-shadow: 0 0 0 3px rgba(108,140,255,.12); }
   .icon-btn, .send-btn { border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--text); border-radius: 12px; cursor: pointer; height: 46px; padding: 0 14px; font-size: 16px; transition: all .2s; }
@@ -131,11 +132,30 @@
   .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px); z-index: 50; background: var(--glass-strong); border: 1px solid var(--border-lit); color: var(--text); padding: 10px 16px; border-radius: 12px; backdrop-filter: blur(14px); box-shadow: 0 10px 30px rgba(0,0,0,.4); opacity: 0; transition: all .3s; pointer-events: none; font-size: 13px; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   @media (max-width: 760px) {
-    #sidebar { position: fixed; top: 0; bottom: 0; left: 0; transform: translateX(-100%); transition: transform .25s; }
+    #sidebar { position: fixed; top: 0; bottom: 0; left: 0; width: 82vw; max-width: 300px; flex-basis: auto; transform: translateX(-100%); transition: transform .25s; padding-top: env(safe-area-inset-top); }
     #sidebar.open { transform: translateX(0); }
     .sb-overlay.show { display: block; }
-    .burger { display: block; }
-    header h1 { font-size: 17px; } select#modelSelect { max-width: 140px; } .bubble img { max-width: 100%; }
+    .burger { display: inline-flex; align-items: center; justify-content: center; }
+    header { padding: 10px 12px; padding-top: calc(10px + env(safe-area-inset-top)); gap: 10px; }
+    header h1 { font-size: 17px; }
+    header .powered { display: none; }
+    header .logo { width: 34px; height: 34px; font-size: 17px; }
+    select#modelSelect { max-width: 120px; padding: 6px 8px; }
+    .status { width: 100%; order: 5; justify-content: flex-start; }
+    main { padding: 16px 12px 8px; gap: 14px; }
+    footer { padding: 8px 10px calc(10px + env(safe-area-inset-bottom)); }
+    .composer { padding: 10px; border-radius: 16px; }
+    .toolbar { gap: 6px; margin-bottom: 8px; }
+    .toggle { padding: 6px 10px; font-size: 12px; }
+    .bubble img { max-width: 100%; }
+    .msg { gap: 9px; }
+    .example { padding: 10px 13px; font-size: 12px; }
+  }
+  @media (max-width: 400px) {
+    .toggle span, .toggle { font-size: 11px; }
+    .status { display: none; }
+    .icon-btn, .send-btn { height: 44px; padding: 0 12px; }
+    .send-btn { padding: 0 14px; }
   }
 </style>
 </head>
@@ -232,6 +252,14 @@
     requestAnimationFrame(frame);
   }
   resize(); requestAnimationFrame(frame);
+})();
+
+/* Hauteur réelle du viewport (fiable sur mobile, gère la barre d'adresse) */
+(function () {
+  const setVH = () => document.documentElement.style.setProperty('--appvh', window.innerHeight + 'px');
+  setVH();
+  addEventListener('resize', setVH);
+  addEventListener('orientationchange', setVH);
 })();
 
 /* ============ APP ============ */
